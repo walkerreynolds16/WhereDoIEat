@@ -22,10 +22,11 @@ android:layout_height="match_parent">
         android:layout_marginTop="64dp"
         android:clickable="true"
         android:onClick="OnFATClick"
-        android:elevation="24dp"
         android:layout_alignParentEnd="true"
         android:layout_alignTop="@id/map"
         android:src="@android:drawable/ic_menu_mylocation"
-        android:theme="@style/MyFloatingButton"/>
+
+        app:colorAccent="@color/colorAccent"
+        app:backgroundTint="@color/colorAccentDark"/>
 
 </RelativeLayout>

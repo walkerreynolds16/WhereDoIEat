@@ -8,9 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MyFloatingButton" parent="Theme.AppCompat.Light">
+    <style name="MyFloatingButton" parent="Theme.AppCompat">
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:tint">@color/colorAccentDark</item>
+        <item name="android:backgroundTint">@color/colorAccentDark</item>
     </style>
 
 </resources>
