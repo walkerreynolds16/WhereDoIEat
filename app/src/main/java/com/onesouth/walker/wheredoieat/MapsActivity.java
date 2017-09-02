@@ -1,5 +1,6 @@
 package com.onesouth.walker.wheredoieat;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -12,8 +13,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.location.places.Places;
@@ -24,28 +35,25 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleMap googleMap;
-    private CameraPosition mCameraPosition;
-
-    private GoogleApiClient googleApiClient;
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int PROXIMITY_RADIUS = 5;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int DEFAULT_ZOOM = 15;
 
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
+    private GoogleMap googleMap;
+    private GoogleApiClient googleApiClient;
+
     private Location currentLocation;
+    private Marker currentMarker;
+
+
     private boolean mLocationPermissionGranted;
-
-    // Keys for storing activity state.
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    private static final String KEY_LOCATION = "location";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +88,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
 
-        //getCurrentLocation();
+        getCurrentLocation();
     }
+
+    private void loadNearByPlaces(double latitude, double longitude)    {
+
+//
+//        googleMap.clear();
+//        Intent i = getIntent();
+//        String type = "food";
+//
+//        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+//        googlePlacesUrl.append("location=").append(latitude).append(",").append(longitude);
+//        googlePlacesUrl.append("&radius=").append(PROXIMITY_RADIUS);
+//        googlePlacesUrl.append("&types=").append(type);
+//        googlePlacesUrl.append("&sensor=true");
+//        googlePlacesUrl.append("&key=" + getString(R.string.google_maps_key));
+//
+//        JsonObjectRequest request = new JsonObjectRequest(googlePlacesUrl.toString(),
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject result) {
+//
+//                        //Log.i(TAG, "onResponse: Result= " + result.toString());
+//                        parseLocationResult(result);
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+////                        Log.e(TAG, "onErrorResponse: Error= " + error);
+////                        Log.e(TAG, "onErrorResponse: Error= " + error.getMessage());
+//                    }
+//                });
+
+
+    }
+
+
 
     public void getCurrentLocation(){
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
@@ -102,14 +146,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             LatLng tempLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-            googleMap.addMarker(new MarkerOptions().position(tempLatLng).title("Marker in Sydney"));
+            if(currentMarker != null){
+                currentMarker.remove();
+            }
+
+            currentMarker = googleMap.addMarker(new MarkerOptions().position(tempLatLng).title("Current Location"));
+            Toast.makeText(this, "Lat: " + tempLatLng.latitude + ", Long: " + tempLatLng.longitude, Toast.LENGTH_SHORT).show();
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLatLng, DEFAULT_ZOOM));
         }
     }
 
     //Set Current Location
     public void OnFATClick(View view){
-        Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
 
         getCurrentLocation();
     }
